@@ -15,10 +15,18 @@ class Imagem:
             intensidade = intensidade[:3]
         if 0 <= x < self.largura and 0 <= y < self.altura:
             self.img[y, x] = np.clip(intensidade, 0, 255)  # Garante que a intensidade esteja no intervalo [0, 255]
+
+    def get_pixel(self, x, y):
+        return self.img[y, x]
     
     def imshow(self):
         plt.imshow(self.img)
         plt.axis('off')  # Remove eixos para visualização limpa
+        plt.show()
+    
+    def imshow2(self):
+        import matplotlib.pyplot as plt
+        plt.imshow(self.img)
         plt.show()
 
     def limpa_imagem(self):
@@ -140,11 +148,14 @@ class Imagem:
                 pi = pf
             if len(p_int) > 1:
                 print_scan(p_int, intensidade, tex)
-
-            
-
-            
-
-
-
     
+    def flood_fill(self, x, y, cor, cor_alvo):
+        largura, altura = self.img.shape[1], self.img.shape[0]
+        if np.array_equal(self.get_pixel(x, y), cor_alvo):
+            pilha = [(x, y)]
+            while pilha:
+                px, py = pilha.pop()
+                if 0 <= px < largura and 0 <= py < altura and np.array_equal(self.get_pixel(px, py), cor_alvo):
+                    self.set_pixel(px, py, cor)
+                    pilha.extend([(px + 1, py), (px - 1, py), (px, py + 1), (px, py - 1)])
+

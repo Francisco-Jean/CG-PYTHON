@@ -22,7 +22,25 @@ class Poligono:
     
     def get_centro(self):
         return self.centro
-    
+
+    def circunferencia(self, im, xc, yc, r, intensidade):
+        # Limpa o polígono atual
+        self.poligono = []
+        self.tamanho_poligono = 0
+        
+        # Adiciona pontos da circunferência ao polígono
+        ang = 0
+        while ang < 2 * np.pi:
+            x = int(xc + r * np.cos(ang))
+            y = int(yc + r * np.sin(ang))
+            
+            # Verifica se os pontos estão dentro dos limites da imagem
+            if 0 <= x < im.largura and 0 <= y < im.altura:
+                self.insere_ponto(x, y, intensidade, 0, 0)  # tx e ty são 0 porque não estamos usando textura aqui
+            ang += 0.25
+        
+        return self.poligono
+        
     def transforma(self, matriz):
         for i in range(len(self.poligono)):
             ponto = np.array([self.poligono[i][0], self.poligono[i][1], 1])
