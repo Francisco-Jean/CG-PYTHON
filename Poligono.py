@@ -39,8 +39,6 @@ class Poligono:
                 self.insere_ponto(x, y, intensidade, 0, 0)  # tx e ty são 0 porque não estamos usando textura aqui
             ang += 0.25
         
-        return self.poligono
-        
     def transforma(self, matriz):
         for i in range(len(self.poligono)):
             ponto = np.array([self.poligono[i][0], self.poligono[i][1], 1])

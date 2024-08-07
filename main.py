@@ -109,7 +109,7 @@ def handle_input(pol, deslocamento):
 
 def main():
     pygame.init()
-    dim = [640, 360]
+    dim = [720, 512]
     img = Imagem.Imagem(dim[0], dim[1])
     textura = Textura.Textura("trafico.jpeg")
     rato0 = Textura.Textura("rato-0.png")

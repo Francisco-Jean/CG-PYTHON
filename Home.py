@@ -1,11 +1,11 @@
-import Poligono
-import Textura
-import Imagem
 import pygame
 from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GL.shaders import compileProgram, compileShader
 import numpy as np
+import Imagem
+import Poligono
+import Textura
 
 # Vertex Shader
 vertex_shader_source = """
@@ -69,108 +69,99 @@ def create_texture():
     glBindTexture(GL_TEXTURE_2D, texture_id)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-    glBindTexture(GL_TEXTURE_2D, 0)
     return texture_id
 
-def home():
-  pygame.init()
+def handleClick():
+    print("Círculo clicado!")
 
-  dim = [720, 512]
+def is_inside_circle(x, y, radius, pos):
+    return np.linalg.norm(np.array((x, y)) - np.array(pos)) <= radius
 
-  pygame.display.set_mode((dim[0], dim[1]), DOUBLEBUF | OPENGL)
-  pygame.display.set_caption("Tela de exibição")
-  clock = pygame.time.Clock()
+def main():
+    pygame.init()
+    dim = [720, 512]
+    img = Imagem.Imagem(dim[0], dim[1])
 
-  img = Imagem.Imagem(dim[0], dim[1])
+    # Criating a Circle
+    circle = Poligono.Poligono()
+    circle.circunferencia(img, 360, 132, 60, (240, 209, 104))
 
-  # Criating a Circle
-  # circle = Poligono.Poligono()
-  # circ = circle.circunferencia(img, 360, 380, 60, (240, 209, 104))
+    # Criating a Triangle
+    tri = Poligono.Poligono()
+    tri.insere_ponto(330, 167, (255, 255, 255), 0, 0)
+    tri.insere_ponto(400, 132, (255, 255, 255), 0, 0)
+    tri.insere_ponto(330, 97, (255, 255, 255), 0, 0)
 
-  # Criating a Triangle
-  tri = Poligono.Poligono()
-  tri.insere_ponto(330, 345, (255, 255, 255), 0, 0)
-  tri.insere_ponto(400, 380, (255, 255, 255), 0, 0)
-  tri.insere_ponto(330, 415, (255, 255, 255), 0, 0)
+    # Criating a Space to Title
+    titulo = Poligono.Poligono()
+    titulo.insere_ponto(68, 362, (255, 255, 255), 0, 0)
+    titulo.insere_ponto(652, 362, (255, 255, 255), 1, 0)
+    titulo.insere_ponto(652, 252, (255, 255, 255), 1, 1)
+    titulo.insere_ponto(68, 252, (255, 255, 255), 0, 1)
 
-  # Criating a Space to Title
-  titulo = Poligono.Poligono()
-  titulo.insere_ponto(62, 150, (255, 255, 255), 0, 0)
-  titulo.insere_ponto(658, 150, (255, 255, 255), 0, 0)
-  titulo.insere_ponto(658, 260, (255, 255, 255), 0, 0)
-  titulo.insere_ponto(62, 260, (255, 255, 255), 0, 0)
+    title = Textura.Textura("Title.png")
 
-  title = Textura.Textura("Title.png")
+    pygame.display.set_mode((dim[0], dim[1]), DOUBLEBUF | OPENGL)
+    pygame.display.set_caption("Cheese Eater")
+    clock = pygame.time.Clock()
 
-  janela = [0, 0, dim[0], dim[1]]
-  viewport = [0, 0, dim[0], dim[1]]
-  tri.mapeiaJanela(janela, viewport)
-  # titulo.mapeiaJanela(janela, viewport)
-  # circ.mapeiaJanela(janela, viewport)
+    janela = [0, 0, dim[0], dim[1]]
+    viewport = [0, 0, dim[0], dim[1]]
+    tri.mapeiaJanela(janela, viewport)
+    titulo.mapeiaJanela(janela, viewport)
+    circle.mapeiaJanela(janela, viewport)
 
-  
+    pygame.display.set_mode((dim[0], dim[1]), DOUBLEBUF | OPENGL)
+    pygame.display.set_caption("Tela de exibição")
+    clock = pygame.time.Clock()
+    running = True
 
-  global shader_program
-  shader_program = create_shader_program(vertex_shader_source, fragment_shader_source)
-  glUseProgram(shader_program)
+    global shader_program
+    shader_program = create_shader_program(vertex_shader_source, fragment_shader_source)
+    glUseProgram(shader_program)
 
-  vertices = np.array([
-      -1.0,  1.0,  0.0, 0.0,
-      -1.0, -1.0,  0.0, 1.0,
-        1.0, -1.0,  1.0, 1.0,
-        1.0,  1.0,  1.0, 0.0,
-  ], dtype=np.float32)
+    vertices = np.array([
+        -1.0,  1.0,  0.0, 0.0,
+        -1.0, -1.0,  0.0, 1.0,
+         1.0, -1.0,  1.0, 1.0,
+         1.0,  1.0,  1.0, 0.0,
+    ], dtype=np.float32)
 
-  indices = np.array([
-      0, 1, 2,
-      2, 3, 0
-  ], dtype=np.uint32)
+    indices = np.array([
+        0, 1, 2,
+        2, 3, 0
+    ], dtype=np.uint32)
 
-  VAO = setup_buffers(vertices, indices)
-  texture_id = create_texture()
+    VAO = setup_buffers(vertices, indices)
+    texture_id = create_texture()
 
-  running = True
-  transformar = True
-  while running:
-    clock.tick(120)
-    for event in pygame.event.get():
-      if event.type == pygame.QUIT:
-        running = False
+    while running:
+        clock.tick(120)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if is_inside_circle(360, 132, 60, event.pos):
+                    handleClick()
+              
+        img.limpa_imagem()
+        glClear(GL_COLOR_BUFFER_BIT)
+        glBindVertexArray(VAO)
+        glDrawElements(GL_TRIANGLES, len(indices), GL_UNSIGNED_INT, None)
+        glBindVertexArray(0)
+        pygame.display.flip()
+        pygame.time.wait(10)
+        
+        img.scanline(circle.poligono, (240, 209, 104))
+        img.scanline(tri.poligono, (255, 255, 255))
+        img.scanline(titulo.poligono, -1, title)
+        img.flood_fill(320, 180, (226, 164, 45), (0, 0, 0))
 
-    if transformar:
-      img.limpa_imagem()
-      glClear(GL_COLOR_BUFFER_BIT)
-      glBindVertexArray(VAO)
-      glDrawElements(GL_TRIANGLES, len(indices), GL_UNSIGNED_INT, None)
-      glBindVertexArray(0)
-      pygame.display.flip()
-      pygame.time.wait(10)
+        glBindTexture(GL_TEXTURE_2D, texture_id)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.largura, img.altura, 0, GL_RGB, GL_UNSIGNED_BYTE, img.img)
+        transformar = False
 
-      img.flood_fill(320, 180, (226, 164, 45), (0, 0, 0))
-      # img.scanline(circ, (240, 209, 104))
-      img.scanline(tri.poligono, (255, 255, 255))
-      img.scanline(titulo.poligono, -1, title)
-
-      glBindTexture(GL_TEXTURE_2D, texture_id)
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.largura, img.altura, 0, GL_RGB, GL_UNSIGNED_BYTE, img.img)
-      transformar = False
-    
-    # Desenhar a textura na tela
-    glClear(GL_COLOR_BUFFER_BIT)
-    glBindTexture(GL_TEXTURE_2D, texture_id)
-    glBegin(GL_QUADS)
-    glTexCoord2f(0.0, 0.0)
-    glVertex2f(-1.0, -1.0)
-    glTexCoord2f(1.0, 0.0)
-    glVertex2f(1.0, -1.0)
-    glTexCoord2f(1.0, 1.0)
-    glVertex2f(1.0, 1.0)
-    glTexCoord2f(0.0, 1.0)
-    glVertex2f(-1.0, 1.0)
-    glEnd()
-    pygame.display.flip()
-
-  pygame.quit()
+    pygame.quit()
 
 if __name__ == "__main__":
-  home()
+    main()
