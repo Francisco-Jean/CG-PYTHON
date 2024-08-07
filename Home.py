@@ -75,24 +75,29 @@ def handleClick():
     print("Círculo clicado!")
 
 def is_inside_circle(x, y, radius, pos):
-    return np.linalg.norm(np.array((x, y)) - np.array(pos)) <= radius
+    # Calcular a distância euclidiana entre o ponto do clique e o centro do círculo
+    distance = np.linalg.norm(np.array((x, y)) - np.array(pos))
+    inside = distance <= radius
+    # Adicionar instruções de depuração
+    print(f"Mouse Pos: {pos}, Circle Center: ({x}, {y}), Radius: {radius}, Distance: {distance}, Inside: {inside}")
+    return inside
 
 def main():
     pygame.init()
     dim = [720, 512]
     img = Imagem.Imagem(dim[0], dim[1])
 
-    # Criating a Circle
+    # Criando um Círculo
     circle = Poligono.Poligono()
     circle.circunferencia(img, 360, 132, 60, (240, 209, 104))
 
-    # Criating a Triangle
+    # Criando um Triângulo
     tri = Poligono.Poligono()
     tri.insere_ponto(330, 167, (255, 255, 255), 0, 0)
     tri.insere_ponto(400, 132, (255, 255, 255), 0, 0)
     tri.insere_ponto(330, 97, (255, 255, 255), 0, 0)
 
-    # Criating a Space to Title
+    # Criando um Espaço para o Título
     titulo = Poligono.Poligono()
     titulo.insere_ponto(68, 362, (255, 255, 255), 0, 0)
     titulo.insere_ponto(652, 362, (255, 255, 255), 1, 0)
@@ -101,10 +106,6 @@ def main():
 
     title = Textura.Textura("Title.png")
 
-    pygame.display.set_mode((dim[0], dim[1]), DOUBLEBUF | OPENGL)
-    pygame.display.set_caption("Cheese Eater")
-    clock = pygame.time.Clock()
-
     janela = [0, 0, dim[0], dim[1]]
     viewport = [0, 0, dim[0], dim[1]]
     tri.mapeiaJanela(janela, viewport)
@@ -112,7 +113,7 @@ def main():
     circle.mapeiaJanela(janela, viewport)
 
     pygame.display.set_mode((dim[0], dim[1]), DOUBLEBUF | OPENGL)
-    pygame.display.set_caption("Tela de exibição")
+    pygame.display.set_caption("Cheese Eater")
     clock = pygame.time.Clock()
     running = True
 
@@ -135,32 +136,33 @@ def main():
     VAO = setup_buffers(vertices, indices)
     texture_id = create_texture()
 
+    # Processar a imagem antes do loop principal
+    img.limpa_imagem()
+    img.scanline(circle.poligono, (240, 209, 104))
+    img.scanline(tri.poligono, (255, 255, 255))
+    img.scanline(titulo.poligono, -1, title)
+    img.flood_fill(320, 180, (226, 164, 45), (0, 0, 0))
+
+    # Carregar a textura resultante uma única vez
+    glBindTexture(GL_TEXTURE_2D, texture_id)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.largura, img.altura, 0, GL_RGB, GL_UNSIGNED_BYTE, img.img)
+
     while running:
-        clock.tick(120)
+        clock.tick(10)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if is_inside_circle(360, 132, 60, event.pos):
+                print(f"Mouse clicked at: {event.pos}")
+                if is_inside_circle(360, 380, 60, event.pos):
                     handleClick()
-              
-        img.limpa_imagem()
+
         glClear(GL_COLOR_BUFFER_BIT)
         glBindVertexArray(VAO)
         glDrawElements(GL_TRIANGLES, len(indices), GL_UNSIGNED_INT, None)
         glBindVertexArray(0)
         pygame.display.flip()
-        pygame.time.wait(10)
         
-        img.scanline(circle.poligono, (240, 209, 104))
-        img.scanline(tri.poligono, (255, 255, 255))
-        img.scanline(titulo.poligono, -1, title)
-        img.flood_fill(320, 180, (226, 164, 45), (0, 0, 0))
-
-        glBindTexture(GL_TEXTURE_2D, texture_id)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.largura, img.altura, 0, GL_RGB, GL_UNSIGNED_BYTE, img.img)
-        transformar = False
-
     pygame.quit()
 
 if __name__ == "__main__":
