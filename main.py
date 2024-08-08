@@ -255,22 +255,6 @@ def main():
             pol.transforma(pol.translacao(dx, dy))
             transformar = True
 
-        # if teclas_pressionadas[pygame.K_a] or teclas_pressionadas[pygame.K_d] or teclas_pressionadas[pygame.K_s] or teclas_pressionadas[pygame.K_w]:
-        #     centro_x, centro_y = pol.get_centro()
-        #     pol.transforma(pol.translacao(-centro_x, -centro_y))
-
-        #     if teclas_pressionadas[pygame.K_a]:
-        #         pol.transforma(pol.rotacao(-deslocamento))
-        #     if teclas_pressionadas[pygame.K_d]:
-        #         pol.transforma(pol.rotacao(deslocamento))
-        #     if teclas_pressionadas[pygame.K_s]:
-        #         pol.transforma(pol.escala(0.7, 0.7))
-        #     if teclas_pressionadas[pygame.K_w]:
-        #         pol.transforma(pol.escala(1.3, 1.3))
-
-        #     pol.transforma(pol.translacao(centro_x, centro_y))
-        #     transformar = True
-
     pygame.quit()
 
 if __name__ == "__main__":

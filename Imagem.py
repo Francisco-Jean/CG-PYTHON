@@ -23,11 +23,6 @@ class Imagem:
         plt.imshow(self.img)
         plt.axis('off')  # Remove eixos para visualização limpa
         plt.show()
-    
-    def imshow2(self):
-        import matplotlib.pyplot as plt
-        plt.imshow(self.img)
-        plt.show()
 
     def limpa_imagem(self):
         self.img.fill(0)  # Método mais eficiente para limpar a imagem

@@ -1,77 +1,9 @@
 import pygame
-from pygame.locals import *
-from OpenGL.GL import *
-from OpenGL.GL.shaders import compileProgram, compileShader
-import numpy as np
 import Imagem
 import Poligono
 import Textura
 
-# Vertex Shader
-vertex_shader_source = """
-#version 330
-in vec2 position;
-in vec2 texCoords;
-out vec2 TexCoords;
-void main()
-{
-    gl_Position = vec4(position, 0.0, 1.0);
-    TexCoords = texCoords;
-}
-"""
-
-# Fragment Shader
-fragment_shader_source = """
-#version 330
-in vec2 TexCoords;
-out vec4 color;
-uniform sampler2D pixel_texture;
-void main()
-{
-    color = texture(pixel_texture, TexCoords);
-}
-"""
-
-def create_shader_program(vertex_src, fragment_src):
-    vertex_shader = compileShader(vertex_src, GL_VERTEX_SHADER)
-    fragment_shader = compileShader(fragment_src, GL_FRAGMENT_SHADER)
-    shader_program = compileProgram(vertex_shader, fragment_shader)
-    return shader_program
-
-def setup_buffers(vertices, indices):
-    VAO = glGenVertexArrays(1)
-    VBO = glGenBuffers(1)
-    EBO = glGenBuffers(1)
-
-    glBindVertexArray(VAO)
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO)
-    glBufferData(GL_ARRAY_BUFFER, vertices.nbytes, vertices, GL_STATIC_DRAW)
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO)
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.nbytes, indices, GL_STATIC_DRAW)
-
-    position = glGetAttribLocation(shader_program, 'position')
-    glVertexAttribPointer(position, 2, GL_FLOAT, GL_FALSE, 4 * vertices.itemsize, ctypes.c_void_p(0))
-    glEnableVertexAttribArray(position)
-
-    texCoords = glGetAttribLocation(shader_program, 'texCoords')
-    glVertexAttribPointer(texCoords, 2, GL_FLOAT, GL_FALSE, 4 * vertices.itemsize, ctypes.c_void_p(2 * vertices.itemsize))
-    glEnableVertexAttribArray(texCoords)
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0)
-    glBindVertexArray(0)
-
-    return VAO
-
-def create_texture():
-    texture_id = glGenTextures(1)
-    glBindTexture(GL_TEXTURE_2D, texture_id)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-    return texture_id
-
-def main():
+def mazeTest():
     pygame.init()
     dim = [720, 512]
     img = Imagem.Imagem(dim[0], dim[1])
@@ -79,62 +11,144 @@ def main():
     # Criando um Espaço para o labirinto
     maze = Poligono.Poligono()
     maze.insere_ponto(0, 0, (255, 255, 255), 0, 0)
-    maze.insere_ponto(dim[0]*3, 0, (255, 255, 255), 1, 0)
-    maze.insere_ponto(dim[0]*3, dim[1]*3, (255, 255, 255), 1, 1)
-    maze.insere_ponto(0, dim[1]*3, (255, 255, 255), 0, 1)
+    maze.insere_ponto(dim[0], 0, (255, 255, 255), 1, 0)
+    maze.insere_ponto(dim[0], dim[1], (255, 255, 255), 1, 1)
+    maze.insere_ponto(0, dim[1], (255, 255, 255), 0, 1)
+
+    rato0 = Textura.Textura("rato1.png")
+    rato1 = Textura.Textura("rato2.png")
+    rato2 = Textura.Textura("rato3.png")
+    rato3 = Textura.Textura("rato4.png")
+    modo = 0
+    cresce = True
+    rato = Poligono.Poligono()
+    rato.insere_ponto(5, 260, (255, 255, 255), 0, 1)
+    rato.insere_ponto(35, 260, (127, 127, 127), 1, 1)
+    rato.insere_ponto(35, 305, (0, 0, 0), 1, 0)
+    rato.insere_ponto(5, 305, (255, 255, 255), 0, 0)
 
     labirinto = Textura.Textura("Nivel 1.png")
 
     janela = [0, 0, dim[0], dim[1]]
     viewport = [0, 0, dim[0], dim[1]]
-    maze.mapeiaJanela(janela, viewport)
+    # maze.mapeiaJanela(janela, viewport)
+    rato.mapeiaJanela(janela, viewport)
 
-    pygame.display.set_mode((dim[0], dim[1]), DOUBLEBUF | OPENGL)
+    screen = pygame.display.set_mode((dim[0], dim[1]))
     pygame.display.set_caption("Cheese Eater")
     clock = pygame.time.Clock()
     running = True
 
-    global shader_program
-    shader_program = create_shader_program(vertex_shader_source, fragment_shader_source)
-    glUseProgram(shader_program)
+    ang = 90
+    modo = 0
+    cresce = True
+    deslocamento = 5
 
-    vertices = np.array([
-        -1.0,  1.0,  0.0, 0.0,
-        -1.0, -1.0,  0.0, 1.0,
-         1.0, -1.0,  1.0, 1.0,
-         1.0,  1.0,  1.0, 0.0,
-    ], dtype=np.float32)
-
-    indices = np.array([
-        0, 1, 2,
-        2, 3, 0
-    ], dtype=np.uint32)
-
-    VAO = setup_buffers(vertices, indices)
-    texture_id = create_texture()
-
-    # Processar a imagem antes do loop principal
-    img.limpa_imagem()
+    transformar = True
     img.scanline(maze.poligono, -1, labirinto)
-    img.flood_fill(320, 180, (226, 164, 45), (0, 0, 0))
-
-    # Carregar a textura resultante uma única vez
-    glBindTexture(GL_TEXTURE_2D, texture_id)
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.largura, img.altura, 0, GL_RGB, GL_UNSIGNED_BYTE, img.img)
 
     while running:
-        clock.tick(10)
+        clock.tick(120)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
-        glClear(GL_COLOR_BUFFER_BIT)
-        glBindVertexArray(VAO)
-        glDrawElements(GL_TRIANGLES, len(indices), GL_UNSIGNED_INT, None)
-        glBindVertexArray(0)
+        if transformar:
+            img.limpa_imagem()
+
+            # Clipping
+            clipped_poligono = rato.clipping_cohen_sutherland(0, 0, dim[0], dim[1])
+            if clipped_poligono:
+                if modo == 0:
+                    img.scanline(clipped_poligono, -1, rato0)
+                elif modo == 1:
+                    img.scanline(rato.poligono, -1, rato1)
+                elif modo == 2:
+                    img.scanline(rato.poligono, -1, rato2)
+                elif modo == 3:
+                    img.scanline(rato.poligono, -1, rato3)
+
+            # Alterna entre os modos de transformação
+            if cresce:
+                modo += 1
+                if modo == 4:
+                    cresce = False
+                    modo -= 1
+            else:
+                modo -= 1
+                if modo == -1:
+                    cresce = True
+                    modo += 1
+
+            # Atualiza a imagem do rato
+            rato_surface = pygame.image.frombuffer(img.img.tobytes(), (img.largura, img.altura), 'RGB')
+            screen.blit(rato_surface, (0, 0))
+
+            transformar = False
+
+        teclas_pressionadas = pygame.key.get_pressed()
+
+        dx, dy = 0, 0
+        if teclas_pressionadas[pygame.K_UP]:
+            dy -= deslocamento
+            if ang != 90:
+                centro_x, centro_y = rato.get_centro()
+                rato.transforma(rato.translacao(-centro_x, -centro_y))
+                if ang == 0:
+                    rato.transforma(rato.rotacao(-90))
+                elif ang == 270:
+                    rato.transforma(rato.rotacao(180))
+                elif ang == 180:
+                    rato.transforma(rato.rotacao(90))
+                rato.transforma(rato.translacao(centro_x, centro_y))
+                ang = 90
+        elif teclas_pressionadas[pygame.K_DOWN]:
+            dy += deslocamento
+            if ang != 270:
+                centro_x, centro_y = rato.get_centro()
+                rato.transforma(rato.translacao(-centro_x, -centro_y))
+                if ang == 0:
+                    rato.transforma(rato.rotacao(90))
+                elif ang == 90:
+                    rato.transforma(rato.rotacao(180))
+                elif ang == 180:
+                    rato.transforma(rato.rotacao(-90))
+                rato.transforma(rato.translacao(centro_x, centro_y))
+                ang = 270
+        elif teclas_pressionadas[pygame.K_LEFT]:
+            dx -= deslocamento
+            if ang != 180:
+                centro_x, centro_y = rato.get_centro()
+                rato.transforma(rato.translacao(-centro_x, -centro_y))
+                if ang == 0:
+                    rato.transforma(rato.rotacao(-180))
+                elif ang == 90:
+                    rato.transforma(rato.rotacao(-90))
+                elif ang == 270:
+                    rato.transforma(rato.rotacao(90))
+                rato.transforma(rato.translacao(centro_x, centro_y))
+                ang = 180
+        elif teclas_pressionadas[pygame.K_RIGHT]:
+            dx += deslocamento
+            if ang != 0:
+                centro_x, centro_y = rato.get_centro()
+                rato.transforma(rato.translacao(-centro_x, -centro_y))
+                if ang == 90:
+                    rato.transforma(rato.rotacao(90))
+                elif ang == 180:
+                    rato.transforma(rato.rotacao(180))
+                elif ang == 270:
+                    rato.transforma(rato.rotacao(-90))
+                rato.transforma(rato.translacao(centro_x, centro_y))
+                ang = 0
+
+        if dx != 0 or dy != 0:
+            rato.transforma(rato.translacao(dx, dy))
+            transformar = True
+
         pygame.display.flip()
-        
+
     pygame.quit()
 
 if __name__ == "__main__":
-    main()
+    mazeTest()
