@@ -5,21 +5,21 @@ import Textura
 
 def mazeTest():
     pygame.init()
-    dim = [720, 512]
+    dim = [1020, 512]
     img = Imagem.Imagem(dim[0], dim[1])
     fundo = Imagem.Imagem(dim[0], dim[1])
 
     # Criando um Espaço para o labirinto
     maze = Poligono.Poligono()
-    maze.insere_ponto(0, 0, (255, 255, 255), 0, 0)
-    maze.insere_ponto(dim[0], 0, (255, 255, 255), 1, 0)
-    maze.insere_ponto(dim[0], dim[1], (255, 255, 255), 1, 1)
-    maze.insere_ponto(0, dim[1], (255, 255, 255), 0, 1)
+    maze.insere_ponto(0, dim[1], (255, 255, 255), 0, 0)
+    maze.insere_ponto(dim[0], dim[1], (255, 255, 255), 1, 0)
+    maze.insere_ponto(dim[0], 0, (255, 255, 255), 1, 1)
+    maze.insere_ponto(0, 0, (255, 255, 255), 0, 1)
 
-    rato0 = Textura.Textura("rato1.png")
-    rato1 = Textura.Textura("rato2.png")
-    rato2 = Textura.Textura("rato3.png")
-    rato3 = Textura.Textura("rato4.png")
+    rato0 = Textura.Textura("rato 1.png")
+    rato1 = Textura.Textura("rato 2.png")
+    rato2 = Textura.Textura("rato 3.png")
+    rato3 = Textura.Textura("rato 4.png")
     modo = 0
     cresce = True
     rato = Poligono.Poligono()
