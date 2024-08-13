@@ -7,6 +7,7 @@ def mazeTest():
     pygame.init()
     dim = [720, 512]
     img = Imagem.Imagem(dim[0], dim[1])
+    fundo = Imagem.Imagem(dim[0], dim[1])
 
     # Criando um Espaço para o labirinto
     maze = Poligono.Poligono()
@@ -26,12 +27,19 @@ def mazeTest():
     rato.insere_ponto(35, 260, (127, 127, 127), 1, 1)
     rato.insere_ponto(35, 305, (0, 0, 0), 1, 0)
     rato.insere_ponto(5, 305, (255, 255, 255), 0, 0)
+    centro_x, centro_y = rato.get_centro()
+    rato.transforma(rato.translacao(-centro_x, -centro_y))
+    rato.transforma(rato.rotacao(-90))
+    rato.transforma(rato.translacao(centro_x, centro_y))
+    rato.transforma(rato.translacao(-centro_x, -centro_y))
+    rato.transforma(rato.escala(0.7, 0.7))
+    rato.transforma(rato.translacao(centro_x, centro_y))
 
     labirinto = Textura.Textura("Nivel 1.png")
 
     janela = [0, 0, dim[0], dim[1]]
     viewport = [0, 0, dim[0], dim[1]]
-    # maze.mapeiaJanela(janela, viewport)
+    maze.mapeiaJanela(janela, viewport)
     rato.mapeiaJanela(janela, viewport)
 
     screen = pygame.display.set_mode((dim[0], dim[1]))
@@ -45,16 +53,20 @@ def mazeTest():
     deslocamento = 5
 
     transformar = True
-    img.scanline(maze.poligono, -1, labirinto)
-
+    fundo.scanline(maze.poligono, -1, labirinto)
+    centro_x, centro_y = rato.get_centro()
+    rato.transforma(rato.translacao(-centro_x, -centro_y))
+    rato.transforma(rato.rotacao(-90))
+    rato.transforma(rato.translacao(centro_x, centro_y))
     while running:
+        
         clock.tick(120)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
         if transformar:
-            img.limpa_imagem()
+            img.img = fundo.img.copy()
 
             # Clipping
             clipped_poligono = rato.clipping_cohen_sutherland(0, 0, dim[0], dim[1])
@@ -89,6 +101,7 @@ def mazeTest():
         teclas_pressionadas = pygame.key.get_pressed()
 
         dx, dy = 0, 0
+        ang_rot = 0
         if teclas_pressionadas[pygame.K_UP]:
             dy -= deslocamento
             if ang != 90:
@@ -96,11 +109,13 @@ def mazeTest():
                 rato.transforma(rato.translacao(-centro_x, -centro_y))
                 if ang == 0:
                     rato.transforma(rato.rotacao(-90))
+                    ang_rot = -90
                 elif ang == 270:
                     rato.transforma(rato.rotacao(180))
+                    ang_rot = 180
                 elif ang == 180:
                     rato.transforma(rato.rotacao(90))
-                rato.transforma(rato.translacao(centro_x, centro_y))
+                    ang_rot = 90
                 ang = 90
         elif teclas_pressionadas[pygame.K_DOWN]:
             dy += deslocamento
@@ -109,11 +124,13 @@ def mazeTest():
                 rato.transforma(rato.translacao(-centro_x, -centro_y))
                 if ang == 0:
                     rato.transforma(rato.rotacao(90))
+                    ang_rot = 90
                 elif ang == 90:
                     rato.transforma(rato.rotacao(180))
+                    ang_rot = 180
                 elif ang == 180:
                     rato.transforma(rato.rotacao(-90))
-                rato.transforma(rato.translacao(centro_x, centro_y))
+                    ang_rot = -90
                 ang = 270
         elif teclas_pressionadas[pygame.K_LEFT]:
             dx -= deslocamento
@@ -122,11 +139,13 @@ def mazeTest():
                 rato.transforma(rato.translacao(-centro_x, -centro_y))
                 if ang == 0:
                     rato.transforma(rato.rotacao(-180))
+                    ang_rot = -180
                 elif ang == 90:
                     rato.transforma(rato.rotacao(-90))
+                    ang_rot = -90
                 elif ang == 270:
                     rato.transforma(rato.rotacao(90))
-                rato.transforma(rato.translacao(centro_x, centro_y))
+                    ang_rot = 90
                 ang = 180
         elif teclas_pressionadas[pygame.K_RIGHT]:
             dx += deslocamento
@@ -135,16 +154,26 @@ def mazeTest():
                 rato.transforma(rato.translacao(-centro_x, -centro_y))
                 if ang == 90:
                     rato.transforma(rato.rotacao(90))
+                    ang_rot = 90
                 elif ang == 180:
                     rato.transforma(rato.rotacao(180))
+                    ang_rot = 180
                 elif ang == 270:
                     rato.transforma(rato.rotacao(-90))
-                rato.transforma(rato.translacao(centro_x, centro_y))
+                    ang_rot = -90
                 ang = 0
+        if rato.check_collision(fundo):
+            rato.transforma(rato.rotacao(-ang_rot))
+            transformar = False
+        if ang_rot != 0:
+            rato.transforma(rato.translacao(centro_x, centro_y))
 
         if dx != 0 or dy != 0:
             rato.transforma(rato.translacao(dx, dy))
             transformar = True
+            if rato.check_collision(fundo):
+                rato.transforma(rato.translacao(-dx, -dy))
+                transformar = False
 
         pygame.display.flip()
 

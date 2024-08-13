@@ -10,6 +10,9 @@ class Poligono:
         self.poligono.append([x, y, i, tx, ty])
         self.tamanho_poligono += 1
         self.centro = self.calcular_centro()
+
+    def get_pontos(self):
+        return self.poligono
     
     def desenha_poligono(self, im, intensidade):
         for i in range(len(self.poligono) - 1):
@@ -22,6 +25,15 @@ class Poligono:
     
     def get_centro(self):
         return self.centro
+
+    def check_collision(self, img):
+        for ponto in self.poligono:
+            x, y, _, _, _ = ponto
+            print(img.get_pixel(round(x), round(y)))
+            pixel = img.get_pixel(round(x), round(y))
+            if pixel[0] == 0 and pixel[1] == 0 and pixel[2] == 0:
+                return True
+        return False
 
     def circunferencia(self, im, xc, yc, r, intensidade):
         # Limpa o polígono atual
