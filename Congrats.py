@@ -1,47 +1,41 @@
 import pygame
-import numpy as np
 import Imagem
 import Poligono
 import Textura
-from MazeTest import mazeTest
+from Home import home
 
 def handleClick():
-    print("Círculo clicado!")
+    print("Quadrado clicado!")
 
-def is_inside_circle(x, y, radius, pos):
-    distance = np.linalg.norm(np.array((x, y)) - np.array(pos))
-    inside = distance <= radius
+def is_inside_square(xmin, xmax, ymin, ymax, pos):
+    inside = xmin <= pos[0] <= xmax and ymin <= pos[1] <= ymax
     return inside
 
-def home():
+def congrats():
     pygame.init()
     dim = [720, 512]
     img = Imagem.Imagem(dim[0], dim[1])
 
-    # Criando um Círculo
-    circle = Poligono.Poligono()
-    circle.circunferencia(img, 360, 132, 60, (240, 209, 104))
-
-    # Criando um Triângulo
-    tri = Poligono.Poligono()
-    tri.insere_ponto(330, 167, (255, 255, 255), 0, 0)
-    tri.insere_ponto(400, 132, (255, 255, 255), 0, 0)
-    tri.insere_ponto(330, 97, (255, 255, 255), 0, 0)
-
     # Criando um Espaço para o Título
     titulo = Poligono.Poligono()
-    titulo.insere_ponto(68, 362, (255, 255, 255), 0, 0)
-    titulo.insere_ponto(652, 362, (255, 255, 255), 1, 0)
-    titulo.insere_ponto(652, 252, (255, 255, 255), 1, 1)
-    titulo.insere_ponto(68, 252, (255, 255, 255), 0, 1)
+    titulo.insere_ponto(69, 334, (255, 255, 255), 0, 0)
+    titulo.insere_ponto(650, 334, (255, 255, 255), 1, 0)
+    titulo.insere_ponto(650, 256, (255, 255, 255), 1, 1)
+    titulo.insere_ponto(69, 256, (255, 255, 255), 0, 1)
 
-    title = Textura.Textura("Title.png")
+    # Criando um Espaço para o botão de voltar
+    back = Poligono.Poligono()
+    back.insere_ponto(210, 317, (255, 255, 255), 0, 0)
+    back.insere_ponto(510, 317, (255, 255, 255), 1, 0)
+    back.insere_ponto(510, 417, (255, 255, 255), 1, 1)
+    back.insere_ponto(210, 417, (255, 255, 255), 0, 1)
+
+    title = Textura.Textura("Congrats-title.png")
+    back_img = Textura.Textura("Home-buttom.png")
 
     janela = [0, 0, dim[0], dim[1]]
     viewport = [0, 0, dim[0], dim[1]]
-    tri.mapeiaJanela(janela, viewport)
     titulo.mapeiaJanela(janela, viewport)
-    circle.mapeiaJanela(janela, viewport)
 
     screen = pygame.display.set_mode((dim[0], dim[1]))
     pygame.display.set_caption("Cheese Eater")
@@ -50,11 +44,10 @@ def home():
 
     # Processar a imagem antes do loop principal
     img.limpa_imagem()
-    img.scanline(circle.poligono, (240, 209, 104))
-    img.scanline(tri.poligono, (255, 255, 255))
     img.scanline(titulo.poligono, -1, title)
-    img.bresenham(68, 130, 652, 130, (255, 255, 255))
-    img.bresenham(68, 280, 652, 280, (255, 255, 255))
+    img.scanline(back.poligono, -1, back_img)
+    img.bresenham(69, 272, 650, 272, (255, 255, 255))
+    img.bresenham(69, 162, 650, 162, (255, 255, 255))
     img.flood_fill(320, 180, (226, 164, 45), (0, 0, 0))
 
     # Converte a imagem processada em uma superfície Pygame
@@ -67,8 +60,8 @@ def home():
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 print(f"Mouse clicked at: {event.pos}")
-                if is_inside_circle(360, 380, 60, event.pos):
-                    mazeTest()
+                if is_inside_square(210, 510, 317, 417, event.pos):
+                    home()
 
         # Desenha a imagem na tela
         screen.blit(surface, (0, 0))
@@ -77,4 +70,4 @@ def home():
     pygame.quit()
 
 if __name__ == "__main__":
-    home()
+    congrats()
