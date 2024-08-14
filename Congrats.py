@@ -16,7 +16,7 @@ def congrats():
     dim = [720, 512]
     img = Imagem.Imagem(dim[0], dim[1])
 
-    # Criando um Espaço para o Título
+    # Criando um Espaço para o texto de parabéns
     titulo = Poligono.Poligono()
     titulo.insere_ponto(69, 334, (255, 255, 255), 0, 0)
     titulo.insere_ponto(650, 334, (255, 255, 255), 1, 0)
@@ -25,17 +25,27 @@ def congrats():
 
     # Criando um Espaço para o botão de voltar
     back = Poligono.Poligono()
-    back.insere_ponto(210, 317, (255, 255, 255), 0, 0)
-    back.insere_ponto(510, 317, (255, 255, 255), 1, 0)
-    back.insere_ponto(510, 417, (255, 255, 255), 1, 1)
-    back.insere_ponto(210, 417, (255, 255, 255), 0, 1)
+    back.insere_ponto(210, 195, (255, 255, 255), 0, 0)
+    back.insere_ponto(510, 195, (255, 255, 255), 1, 0)
+    back.insere_ponto(510, 95, (255, 255, 255), 1, 1)
+    back.insere_ponto(210, 95, (255, 255, 255), 0, 1)
+
+    # Criando um Espaço para o botão de voltar
+    rato = Poligono.Poligono()
+    rato.insere_ponto(488, 0, (255, 255, 255), 0, 1)
+    rato.insere_ponto(488, 240, (255, 255, 255), 0, 0)
+    rato.insere_ponto(dim[0], 240, (255, 255, 255), 1, 0)
+    rato.insere_ponto(dim[0], 0, (255, 255, 255), 1, 1)
 
     title = Textura.Textura("Congrats-title.png")
     back_img = Textura.Textura("Home-buttom.png")
+    rat = Textura.Textura("Rat Mascot 1.png")
 
     janela = [0, 0, dim[0], dim[1]]
     viewport = [0, 0, dim[0], dim[1]]
     titulo.mapeiaJanela(janela, viewport)
+    back.mapeiaJanela(janela, viewport)
+    rato.mapeiaJanela(janela, viewport)
 
     screen = pygame.display.set_mode((dim[0], dim[1]))
     pygame.display.set_caption("Cheese Eater")
@@ -44,6 +54,7 @@ def congrats():
 
     # Processar a imagem antes do loop principal
     img.limpa_imagem()
+    img.scanline(rato.poligono, -1, rat)
     img.scanline(titulo.poligono, -1, title)
     img.scanline(back.poligono, -1, back_img)
     img.bresenham(69, 272, 650, 272, (255, 255, 255))
