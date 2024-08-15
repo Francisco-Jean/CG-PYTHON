@@ -37,6 +37,12 @@ def congrats():
     rato.insere_ponto(dim[0], 240, (255, 255, 255), 1, 0)
     rato.insere_ponto(dim[0], 0, (255, 255, 255), 1, 1)
 
+    background = Poligono.Poligono()
+    background.insere_ponto(0, 0, (226, 164, 45), 0, 1)
+    background.insere_ponto(0, dim[1], (226, 164, 45), 0, 0)
+    background.insere_ponto(dim[0], dim[1], (226, 164, 45), 1, 0)
+    background.insere_ponto(dim[0], 0, (226, 164, 45), 1, 1)
+
     title = Textura.Textura("Congrats-title.png")
     back_img = Textura.Textura("Home-buttom.png")
     rat = Textura.Textura("Rat Mascot 1.png")
@@ -54,6 +60,7 @@ def congrats():
 
     # Processar a imagem antes do loop principal
     img.limpa_imagem()
+    # img.scanline(background.poligono, (226, 164, 45))
     img.scanline(rato.poligono, -1, rat)
     img.scanline(titulo.poligono, -1, title)
     img.scanline(back.poligono, -1, back_img)

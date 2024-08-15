@@ -2,6 +2,7 @@ import pygame
 import Imagem
 import Poligono
 import Textura
+from random import randint
 
 def mazeTest():
     pygame.init()
@@ -35,7 +36,13 @@ def mazeTest():
     rato.transforma(rato.escala(0.7, 0.7))
     rato.transforma(rato.translacao(centro_x, centro_y))
 
-    labirinto = Textura.Textura("Nivel 1.png")
+    lab_choose = randint(1, 3)
+    if lab_choose == 1:
+        labirinto = Textura.Textura("Nivel 1.png")
+    elif lab_choose == 2:
+        labirinto = Textura.Textura("Nivel 2.png")
+    elif lab_choose == 3:
+        labirinto = Textura.Textura("Nivel 3.png")
 
     janela = [0, 0, dim[0], dim[1]]
     viewport = [0, 0, dim[0], dim[1]]
