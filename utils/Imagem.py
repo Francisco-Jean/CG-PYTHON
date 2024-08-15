@@ -2,7 +2,6 @@ import numpy as np
 from numpy import sign
 import matplotlib.pyplot as plt
 from math import floor
-import concurrent.futures
 
 class Imagem:
     def __init__(self, largura, altura):

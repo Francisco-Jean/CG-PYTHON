@@ -1,7 +1,7 @@
 import pygame
-import Imagem
-import Poligono
-import Textura
+import utils.Imagem as Imagem
+import utils.Poligono as Poligono
+import utils.Textura as Textura
 from Home import home
 
 def handleClick():
@@ -43,9 +43,9 @@ def congrats():
     background.insere_ponto(dim[0], dim[1], (226, 164, 45), 1, 0)
     background.insere_ponto(dim[0], 0, (226, 164, 45), 1, 1)
 
-    title = Textura.Textura("Congrats-title.png")
-    back_img = Textura.Textura("Home-buttom.png")
-    rat = Textura.Textura("Rat Mascot 1.png")
+    title = Textura.Textura("assets/Congrats-title.png")
+    back_img = Textura.Textura("assets/Home-buttom.png")
+    rat = Textura.Textura("assets/Rat Mascot 1.png")
 
     janela = [0, 0, dim[0], dim[1]]
     viewport = [0, 0, dim[0], dim[1]]
@@ -60,13 +60,13 @@ def congrats():
 
     # Processar a imagem antes do loop principal
     img.limpa_imagem()
-    # img.scanline(background.poligono, (226, 164, 45))
+    img.scanline(background.poligono, (226, 164, 45))
     img.scanline(rato.poligono, -1, rat)
     img.scanline(titulo.poligono, -1, title)
     img.scanline(back.poligono, -1, back_img)
     img.bresenham(69, 272, 650, 272, (255, 255, 255))
     img.bresenham(69, 162, 650, 162, (255, 255, 255))
-    img.flood_fill(320, 180, (226, 164, 45), (0, 0, 0))
+    # img.flood_fill(320, 180, (226, 164, 45), (0, 0, 0))
 
     # Converte a imagem processada em uma superfície Pygame
     surface = pygame.image.frombuffer(img.img.tobytes(), (img.largura, img.altura), "RGB")
@@ -77,7 +77,6 @@ def congrats():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                print(f"Mouse clicked at: {event.pos}")
                 if is_inside_square(210, 510, 317, 417, event.pos):
                     home()
 

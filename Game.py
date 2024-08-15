@@ -1,7 +1,7 @@
 import pygame
-import Imagem
-import Poligono
-import Textura
+import utils.Imagem as Imagem
+import utils.Poligono as Poligono
+import utils.Textura as Textura
 from random import randint
 
 def mazeTest():
@@ -17,10 +17,10 @@ def mazeTest():
     maze.insere_ponto(dim[0], 0, (255, 255, 255), 1, 1)
     maze.insere_ponto(0, 0, (255, 255, 255), 0, 1)
 
-    rato0 = Textura.Textura("rato 1.png")
-    rato1 = Textura.Textura("rato 2.png")
-    rato2 = Textura.Textura("rato 3.png")
-    rato3 = Textura.Textura("rato 4.png")
+    rato0 = Textura.Textura("assets/rato 1.png")
+    rato1 = Textura.Textura("assets/rato 2.png")
+    rato2 = Textura.Textura("assets/rato 3.png")
+    rato3 = Textura.Textura("assets/rato 4.png")
     modo = 0
     cresce = True
     rato = Poligono.Poligono()
@@ -38,11 +38,11 @@ def mazeTest():
 
     lab_choose = randint(1, 3)
     if lab_choose == 1:
-        labirinto = Textura.Textura("Nivel 1.png")
+        labirinto = Textura.Textura("assets/Nivel 1.png")
     elif lab_choose == 2:
-        labirinto = Textura.Textura("Nivel 2.png")
+        labirinto = Textura.Textura("assets/Nivel 2.png")
     elif lab_choose == 3:
-        labirinto = Textura.Textura("Nivel 3.png")
+        labirinto = Textura.Textura("assets/Nivel 3.png")
 
     janela = [0, 0, dim[0], dim[1]]
     viewport = [0, 0, dim[0], dim[1]]

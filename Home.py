@@ -1,9 +1,9 @@
 import pygame
 import numpy as np
-import Imagem
-import Poligono
-import Textura
-from MazeTest import mazeTest
+import utils.Imagem as Imagem
+import utils.Poligono as Poligono
+import utils.Textura as Textura
+from Game import mazeTest
 
 def handleClick():
     print("Círculo clicado!")
@@ -35,7 +35,7 @@ def home():
     titulo.insere_ponto(652, 252, (255, 255, 255), 1, 1)
     titulo.insere_ponto(68, 252, (255, 255, 255), 0, 1)
 
-    title = Textura.Textura("Title.png")
+    title = Textura.Textura("assets/Title.png")
 
     janela = [0, 0, dim[0], dim[1]]
     viewport = [0, 0, dim[0], dim[1]]
@@ -66,7 +66,6 @@ def home():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                print(f"Mouse clicked at: {event.pos}")
                 if is_inside_circle(360, 380, 60, event.pos):
                     mazeTest()
 
