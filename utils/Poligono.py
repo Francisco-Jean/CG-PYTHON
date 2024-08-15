@@ -34,7 +34,7 @@ class Poligono:
             pixel = img.get_pixel(round(x), round(y))
             if pixel[0] == 0 and pixel[1] == 0 and pixel[2] == 0:
                 return True
-            if pixel[0] == 251 and pixel[1] == 204 and pixel[2] == 66:
+            if pixel[0] == 255 and pixel[1] == 245 and pixel[2] == 0:
                 congrats()
 
         return False
