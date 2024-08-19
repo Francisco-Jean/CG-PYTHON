@@ -28,9 +28,18 @@ class Poligono:
         return self.centro
 
     def check_collision(self, img):
-        for ponto in self.poligono:
-            x, y, _, _, _ = ponto
-            print(img.get_pixel(round(x), round(y)))
+
+        pontos = np.array([p[:2] for p in self.poligono])  # Extraímos apenas as coordenadas x e y
+
+        # calcula todos os pontos da borda do polígono
+        borda = []
+        for i in range(len(pontos) - 1):
+            borda += list(zip(np.linspace(pontos[i][0], pontos[i + 1][0], 100), np.linspace(pontos[i][1], pontos[i + 1][1], 100)))
+        borda += list(zip(np.linspace(pontos[-1][0], pontos[0][0], 100), np.linspace(pontos[-1][1], pontos[0][1], 100)))
+
+        # verifica se algum ponto da borda do polígono está sobre um pixel preto
+        for ponto in borda:
+            x, y = ponto
             pixel = img.get_pixel(round(x), round(y))
             if pixel[0] == 0 and pixel[1] == 0 and pixel[2] == 0:
                 return True

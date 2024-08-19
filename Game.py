@@ -169,9 +169,9 @@ def mazeTest():
                     rato.transforma(rato.rotacao(-90))
                     ang_rot = -90
                 ang = 0
-        if rato.check_collision(fundo):
-            rato.transforma(rato.rotacao(-ang_rot))
-            transformar = False
+        # if rato.check_collision(fundo):
+        #     rato.transforma(rato.rotacao(-ang_rot))
+        #     transformar = False
         if ang_rot != 0:
             rato.transforma(rato.translacao(centro_x, centro_y))
 

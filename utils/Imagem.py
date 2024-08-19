@@ -130,18 +130,21 @@ class Imagem:
                             cor = tex.get_texel(tx, ty)
                     self.set_pixel(round(x), round(y), cor)
 
-        yi, yf = min(p[1] for p in poligono), max(p[1] for p in poligono)
-        
-        for y in range(round(yi), round(yf)):
-            p_int = []
-            pi = poligono[-1]
-            for pf in poligono:
-                intersec = intersecao(y, pi, pf)
-                if intersec:
-                    p_int.append(intersec)
-                pi = pf
-            if len(p_int) > 1:
-                print_scan(p_int, intensidade, tex)
+        try:
+            yi, yf = min(p[1] for p in poligono), max(p[1] for p in poligono)
+            
+            for y in range(round(yi), round(yf)):
+                p_int = []
+                pi = poligono[-1]
+                for pf in poligono:
+                    intersec = intersecao(y, pi, pf)
+                    if intersec:
+                        p_int.append(intersec)
+                    pi = pf
+                if len(p_int) > 1:
+                    print_scan(p_int, intensidade, tex)
+        except:
+            pass
     
     def flood_fill(self, x, y, cor, cor_alvo):
         largura, altura = self.img.shape[1], self.img.shape[0]
