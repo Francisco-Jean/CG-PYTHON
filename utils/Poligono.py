@@ -105,7 +105,7 @@ class Poligono:
             [0, 0, 1]
         ])
         return np.dot(matriz, t)
-    
+
     def mapeiaJanela(self, j, v):
         lvp = v[2]
         lj = j[2]

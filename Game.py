@@ -5,6 +5,11 @@ import utils.Textura as Textura
 from random import randint
 
 def mazeTest():
+
+    pygame.mixer.init()
+    pygame.mixer.music.load('assets/jogo.mp3')
+    pygame.mixer.music.play(loops=-1)
+
     pygame.init()
     dim = [1020, 512]
     img = Imagem.Imagem(dim[0], dim[1])
@@ -16,6 +21,12 @@ def mazeTest():
     maze.insere_ponto(dim[0], dim[1], (255, 255, 255), 1, 0)
     maze.insere_ponto(dim[0], 0, (255, 255, 255), 1, 1)
     maze.insere_ponto(0, 0, (255, 255, 255), 0, 1)
+
+    mini_maze = Poligono.Poligono()
+    mini_maze.insere_ponto(0, dim[1], (255, 255, 255), 0, 0)
+    mini_maze.insere_ponto(dim[0], dim[1], (255, 255, 255), 1, 0)
+    mini_maze.insere_ponto(dim[0], 0, (255, 255, 255), 1, 1)
+    mini_maze.insere_ponto(0, 0, (255, 255, 255), 0, 1)
 
     rato0 = Textura.Textura("assets/rato 1.png")
     rato1 = Textura.Textura("assets/rato 2.png")
@@ -45,8 +56,12 @@ def mazeTest():
         labirinto = Textura.Textura("assets/Nivel 3.png")
 
     janela = [0, 0, dim[0], dim[1]]
-    viewport = [0, 0, dim[0], dim[1]]
+    x_min, y_min = [100, 100]
+    viewport = [x_min, y_min, dim[0] - x_min, dim[1] - y_min]
+    mine_passo = 0.2
+    mini_viewport = [0, 0, dim[0] * mine_passo, dim[1] * mine_passo]
     maze.mapeiaJanela(janela, viewport)
+    mini_maze.mapeiaJanela(janela, mini_viewport)
     rato.mapeiaJanela(janela, viewport)
 
     screen = pygame.display.set_mode((dim[0], dim[1]))
@@ -61,10 +76,20 @@ def mazeTest():
 
     transformar = True
     fundo.scanline(maze.poligono, -1, labirinto)
+    fundo.scanline(mini_maze.poligono, (255, 255, 255))
     centro_x, centro_y = rato.get_centro()
     rato.transforma(rato.translacao(-centro_x, -centro_y))
     rato.transforma(rato.rotacao(-90))
     rato.transforma(rato.translacao(centro_x, centro_y))
+
+    ponto_personagem = Poligono.Poligono()
+    ponto_personagem.insere_ponto(5, 260, (0, 0, 0), 0, 1)
+    ponto_personagem.insere_ponto(35, 260, (0, 0, 0), 1, 1)
+    ponto_personagem.insere_ponto(35, 305, (0, 0, 0), 1, 0)
+    ponto_personagem.insere_ponto(5, 305, (0, 0, 0), 0, 0)
+
+    ponto_personagem.mapeiaJanela(janela, mini_viewport)
+
     while running:
         
         clock.tick(120)
@@ -75,17 +100,17 @@ def mazeTest():
         if transformar:
             img.img = fundo.img.copy()
 
-            # Clipping
-            clipped_poligono = rato.clipping_cohen_sutherland(0, 0, dim[0], dim[1])
-            if clipped_poligono:
-                if modo == 0:
-                    img.scanline(clipped_poligono, -1, rato0)
-                elif modo == 1:
-                    img.scanline(rato.poligono, -1, rato1)
-                elif modo == 2:
-                    img.scanline(rato.poligono, -1, rato2)
-                elif modo == 3:
-                    img.scanline(rato.poligono, -1, rato3)
+            if modo == 0:
+                img.scanline(rato.poligono, -1, rato0)
+            elif modo == 1:
+                img.scanline(rato.poligono, -1, rato1)
+                
+            elif modo == 2:
+                img.scanline(rato.poligono, -1, rato2)
+            elif modo == 3:
+                img.scanline(rato.poligono, -1, rato3)
+            
+            img.scanline(ponto_personagem.poligono, (0, 0, 255))
 
             # Alterna entre os modos de transformação
             if cresce:
@@ -177,13 +202,22 @@ def mazeTest():
 
         if dx != 0 or dy != 0:
             rato.transforma(rato.translacao(dx, dy))
+            ponto_personagem.transforma(ponto_personagem.translacao(dx * mine_passo , dy * mine_passo))
             transformar = True
-            if rato.check_collision(fundo):
+
+            try:
+                if rato.check_collision(fundo):
+                    rato.transforma(rato.translacao(-dx, -dy))
+                    ponto_personagem.transforma(ponto_personagem.translacao(-dx * mine_passo, -dy * mine_passo))
+                    transformar = False
+            except:
                 rato.transforma(rato.translacao(-dx, -dy))
+                ponto_personagem.transforma(ponto_personagem.translacao(-dx * mine_passo, -dy * mine_passo))
                 transformar = False
 
         pygame.display.flip()
 
+    pygame.mixer.music.stop()
     pygame.quit()
 
 if __name__ == "__main__":

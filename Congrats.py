@@ -12,6 +12,9 @@ def is_inside_square(xmin, xmax, ymin, ymax, pos):
     return inside
 
 def congrats():
+    pygame.mixer.init()
+    pygame.mixer.music.load('assets/win.mp3')
+    pygame.mixer.music.play(loops=-1)
     pygame.init()
     dim = [720, 512]
     img = Imagem.Imagem(dim[0], dim[1])
@@ -84,6 +87,7 @@ def congrats():
         screen.blit(surface, (0, 0))
         pygame.display.flip()
         
+    pygame.mixer.music.stop()
     pygame.quit()
 
 if __name__ == "__main__":

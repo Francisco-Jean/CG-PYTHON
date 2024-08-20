@@ -14,6 +14,9 @@ def is_inside_circle(x, y, radius, pos):
     return inside
 
 def home():
+    pygame.mixer.init()
+    pygame.mixer.music.load('assets/start.mp3')
+    pygame.mixer.music.play(loops=-1)
     pygame.init()
     dim = [720, 512]
     img = Imagem.Imagem(dim[0], dim[1])
@@ -73,6 +76,7 @@ def home():
         screen.blit(surface, (0, 0))
         pygame.display.flip()
         
+    pygame.mixer.music.stop()
     pygame.quit()
 
 if __name__ == "__main__":
